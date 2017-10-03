@@ -38,7 +38,7 @@
 #include "usbd_cdc_if.h"	
 #define dfm_master_tim htim1
 #define dfm_slave_tim htim2
-#define pwm_tim htim3
+#define pwm_tim htim14
 
 #define CONVERSIONS (200)
 #define ADC_CHANNELS (3)
@@ -58,6 +58,7 @@ DMA_HandleTypeDef hdma_adc;
 TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
+TIM_HandleTypeDef htim14;
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
@@ -72,7 +73,7 @@ static void MX_ADC_Init(void);
 static void MX_TIM1_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_TIM3_Init(void);
-
+static void MX_TIM14_Init(void);
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
                 
 
@@ -85,8 +86,8 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 void show_help() {
 	char buf[210];
  //wait for first transmission to finish with a bit of space
-	snprintf(buf, 209, "\r\n\n\nh or ? -> show this help\r\nq/w -> inc/dec pwm duty cycle by 10%%\r\ne/r -> inc/dec pwm freq rough\r\nd/f -> inc/dec pwm freq smooth\r\n\n\n042 Terminal Lab - Tomas Svitil, Dept of Measurement, FEL, CTU in Prague\r\n\n");
-	CDC_Transmit_FS((uint8_t *)buf, 209);
+	snprintf(buf, 207, "\r\n\n\nh or ? -> show this help\r\nq/w -> inc/dec pwm duty cycle by 10%%\r\ne/r -> inc/dec pwm freq rough\r\nd/f -> inc/dec pwm freq smooth\r\n042 Terminal Lab - Tomas Svitil, Dept of Measurement, FEL, CTU in Prague\r\n\n");
+	CDC_Transmit_FS((uint8_t *)buf, 207);
 
 	
 }
@@ -207,7 +208,8 @@ int main(void)
   MX_TIM1_Init();
   MX_TIM2_Init();
   MX_TIM3_Init();
-  MX_USB_DEVICE_Init();
+	MX_TIM14_Init();
+	MX_USB_DEVICE_Init();
 
   /* USER CODE BEGIN 2 */
   HAL_Delay(USB_ENUMERATION_DELAY_MS);
@@ -222,12 +224,14 @@ int main(void)
 	HAL_TIM_IC_Start(&dfm_slave_tim, TIM_CHANNEL_1);
 	HAL_TIM_Base_Start(&dfm_master_tim);
 	HAL_TIM_OC_Start(&dfm_master_tim, TIM_CHANNEL_1);
+	
 	HAL_TIM_Base_Start(&pwm_tim);
 	HAL_TIM_PWM_Start(&pwm_tim, TIM_CHANNEL_1);
 	
 	HAL_ADC_Start_DMA(&hadc, (uint32_t *)&adc_buffer, CONVERSIONS*ADC_CHANNELS);
 
-	show_help();
+	CDC_Transmit_FS("Type h or ? for help\r\n\n", 23);
+	HAL_Delay(200);
 
   /* USER CODE END 2 */
 
@@ -269,7 +273,7 @@ int main(void)
 	  freq_dfm = __HAL_TIM_GET_COMPARE(&dfm_slave_tim, TIM_CHANNEL_1);
 	  freq_pwm =  (HAL_RCC_GetPCLK1Freq())/((&pwm_tim)->Instance->PSC+1)/((&pwm_tim)->Instance->ARR+1);
 			
-	  sprintf(message, "vdd: %4d, ADC PA1: %4dmV PA2: %4dmV, \tFreq PA0: %8d, PWM PA6: %4d, Duty: %3d%%    \r", vdd, calc[0], calc[1], freq_dfm,freq_pwm,duty_cycle);
+	  sprintf(message, "Vdd: %4dmV, ADC PA1: %4dmV PA2: %4dmV, \tFreq PA0: %8d, PWM PA6: %4d, Duty: %3d%%    \r", vdd, calc[0], calc[1], freq_dfm,freq_pwm,duty_cycle);
 		CDC_Transmit_FS((uint8_t *) message,strlen(message));
 	  HAL_Delay(100);
   }
@@ -462,6 +466,34 @@ void MX_TIM3_Init(void)
   HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1);
 
   HAL_TIM_MspPostInit(&htim3);
+
+}
+
+/* TIM14 init function */
+void MX_TIM14_Init(void)
+{
+
+  TIM_MasterConfigTypeDef sMasterConfig;
+  TIM_OC_InitTypeDef sConfigOC;
+
+  htim14.Instance = TIM14;
+  htim14.Init.Prescaler = 47;
+  htim14.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim14.Init.Period = 999;
+  htim14.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  HAL_TIM_PWM_Init(&htim14);
+
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  HAL_TIMEx_MasterConfigSynchronization(&htim14, &sMasterConfig);
+
+  sConfigOC.OCMode = TIM_OCMODE_PWM1;
+  sConfigOC.Pulse = 499;
+  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+  HAL_TIM_PWM_ConfigChannel(&htim14, &sConfigOC, TIM_CHANNEL_1);
+
+  HAL_TIM_MspPostInit(&htim14);
 
 }
 
