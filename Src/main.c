@@ -38,9 +38,11 @@
 #include "usbd_cdc_if.h"	
 #define dfm_master_tim htim1
 #define dfm_slave_tim htim2
+#define adc_tim	htim3
 #define pwm_tim htim14
 
-#define CONVERSIONS (200)
+#define CONVERSIONS (50)
+#define REFRESH_PERIOD_MS (200)
 #define ADC_CHANNELS (3)
 #define USB_ENUMERATION_DELAY_MS (2000)
 
@@ -225,12 +227,15 @@ int main(void)
 	HAL_TIM_Base_Start(&dfm_master_tim);
 	HAL_TIM_OC_Start(&dfm_master_tim, TIM_CHANNEL_1);
 	
+	HAL_TIM_Base_Start(&adc_tim);
+	HAL_TIM_OC_Start(&adc_tim, TIM_CHANNEL_1);
+	
 	HAL_TIM_Base_Start(&pwm_tim);
 	HAL_TIM_PWM_Start(&pwm_tim, TIM_CHANNEL_1);
 	
 	HAL_ADC_Start_DMA(&hadc, (uint32_t *)&adc_buffer, CONVERSIONS*ADC_CHANNELS);
 
-	CDC_Transmit_FS("Type h or ? for help\r\n\n", 23);
+	CDC_Transmit_FS("\nType h or ? for help\r\n", 23);
 	HAL_Delay(200);
 
   /* USER CODE END 2 */
@@ -254,9 +259,11 @@ int main(void)
 		}
 	  //calculate adc values, average from #CONVERSION samples
 	  for(int i = 0; i < ADC_CHANNELS*CONVERSIONS; i+= ADC_CHANNELS){  
-		  calc[0] += adc_buffer[i];
+			
+			calc[0] += adc_buffer[i];
 		  calc[1] += adc_buffer[i+1];
 			calc[2] += adc_buffer[i+2];
+			
 	  }
 		
 		calc[2] /= CONVERSIONS;
@@ -273,9 +280,9 @@ int main(void)
 	  freq_dfm = __HAL_TIM_GET_COMPARE(&dfm_slave_tim, TIM_CHANNEL_1);
 	  freq_pwm =  (HAL_RCC_GetPCLK1Freq())/((&pwm_tim)->Instance->PSC+1)/((&pwm_tim)->Instance->ARR+1);
 			
-	  sprintf(message, "Vdd: %4dmV, ADC PA1: %4dmV PA2: %4dmV, \tFreq PA0: %8d, PWM PA6: %4d, Duty: %3d%%    \r", vdd, calc[0], calc[1], freq_dfm,freq_pwm,duty_cycle);
+	  sprintf(message, "Vdd: %4dmV, ADC PA1: %4dmV PA2: %4dmV, Freq in PA0: %8dHz, PWM out PA4: %dHz, Duty: %3d%%    \r", vdd, calc[0], calc[1], freq_dfm,freq_pwm,duty_cycle);
 		CDC_Transmit_FS((uint8_t *) message,strlen(message));
-	  HAL_Delay(100);
+	  HAL_Delay(REFRESH_PERIOD_MS);
   }
   /* USER CODE END 3 */
 
@@ -325,16 +332,17 @@ void MX_ADC_Init(void)
     /**Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion) 
     */
   hadc.Instance = ADC1;
-  hadc.Init.ClockPrescaler = ADC_CLOCK_ASYNC_DIV1;
+  hadc.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
   hadc.Init.Resolution = ADC_RESOLUTION_12B;
   hadc.Init.DataAlign = ADC_DATAALIGN_RIGHT;
   hadc.Init.ScanConvMode = ADC_SCAN_DIRECTION_FORWARD;
-  hadc.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
+  hadc.Init.EOCSelection = ADC_EOC_SEQ_CONV;
   hadc.Init.LowPowerAutoWait = DISABLE;
   hadc.Init.LowPowerAutoPowerOff = DISABLE;
-  hadc.Init.ContinuousConvMode = ENABLE;
+  hadc.Init.ContinuousConvMode = DISABLE;
   hadc.Init.DiscontinuousConvMode = DISABLE;
-  hadc.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
+  hadc.Init.ExternalTrigConv = ADC1_2_EXTERNALTRIG_T3_TRGO;
+	hadc.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_RISING;
   hadc.Init.DMAContinuousRequests = ENABLE;
   hadc.Init.Overrun = ADC_OVR_DATA_PRESERVED;
   HAL_ADC_Init(&hadc);
@@ -446,26 +454,30 @@ void MX_TIM3_Init(void)
 {
 
   TIM_MasterConfigTypeDef sMasterConfig;
+  TIM_ClockConfigTypeDef sClockSourceConfig;
   TIM_OC_InitTypeDef sConfigOC;
 
   htim3.Instance = TIM3;
   htim3.Init.Prescaler = 47;
   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim3.Init.Period = 999;
+  htim3.Init.Period = 9999;
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  HAL_TIM_PWM_Init(&htim3);
-
-  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  HAL_TIM_Base_Init(&htim3);
+	
+	sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+	HAL_TIM_ConfigClockSource(&htim3, &sClockSourceConfig);
+	
+	HAL_TIM_OC_Init(&htim3);
+	
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_OC1;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
   HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig);
 
-  sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 499;
+  sConfigOC.OCMode = TIM_OCMODE_TIMING;
+  sConfigOC.Pulse = 9999;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1);
-
-  HAL_TIM_MspPostInit(&htim3);
 
 }
 
@@ -481,7 +493,7 @@ void MX_TIM14_Init(void)
   htim14.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim14.Init.Period = 999;
   htim14.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  HAL_TIM_PWM_Init(&htim14);
+  HAL_TIM_Base_Init(&htim14);
 
   sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
