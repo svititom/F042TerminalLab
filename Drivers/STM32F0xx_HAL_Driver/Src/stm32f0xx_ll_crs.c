@@ -1,10 +1,12 @@
 /**
   ******************************************************************************
-  * File Name          : mxconstants.h
-  * Description        : This file contains the common defines of the application
+  * @file    stm32f0xx_ll_crs.h
+  * @author  MCD Application Team
+  * @brief   CRS LL module driver.
   ******************************************************************************
+  * @attention
   *
-  * COPYRIGHT(c) 2016 STMicroelectronics
+  * <h2><center>&copy; COPYRIGHT(c) 2016 STMicroelectronics</center></h2>
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -30,24 +32,71 @@
   *
   ******************************************************************************
   */
+#if defined(USE_FULL_LL_DRIVER)
+
 /* Includes ------------------------------------------------------------------*/
+#include "stm32f0xx_ll_crs.h"
+#include "stm32f0xx_ll_bus.h"
 
-/* USER CODE BEGIN Includes */
+/** @addtogroup STM32F0xx_LL_Driver
+  * @{
+  */
 
-/* USER CODE END Includes */
+#if defined(CRS)
 
-/* Private define ------------------------------------------------------------*/
+/** @defgroup CRS_LL CRS
+  * @{
+  */
 
-/* USER CODE BEGIN Private defines */
+/* Private types -------------------------------------------------------------*/
+/* Private variables ---------------------------------------------------------*/
+/* Private constants ---------------------------------------------------------*/
+/* Private macros ------------------------------------------------------------*/
+/* Private function prototypes -----------------------------------------------*/
 
-/* USER CODE END Private defines */
+/* Exported functions --------------------------------------------------------*/
+/** @addtogroup CRS_LL_Exported_Functions
+  * @{
+  */
+
+/** @addtogroup CRS_LL_EF_Init
+  * @{
+  */
+
+/**
+  * @brief  De-Initializes CRS peripheral registers to their default reset values.
+  * @retval An ErrorStatus enumeration value:
+  *          - SUCCESS: CRS registers are de-initialized
+  *          - ERROR: not applicable
+  */
+ErrorStatus LL_CRS_DeInit(void)
+{
+  LL_APB1_GRP1_ForceReset(LL_APB1_GRP1_PERIPH_CRS);
+  LL_APB1_GRP1_ReleaseReset(LL_APB1_GRP1_PERIPH_CRS);
+
+  return  SUCCESS;
+}
+
+
 
 /**
   * @}
-  */ 
+  */
 
 /**
   * @}
-*/ 
+  */
+
+/**
+  * @}
+  */
+
+#endif /* defined(CRS) */
+
+/**
+  * @}
+  */
+  
+#endif /* USE_FULL_LL_DRIVER */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

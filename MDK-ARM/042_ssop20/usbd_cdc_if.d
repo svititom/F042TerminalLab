@@ -17,11 +17,10 @@
 042_ssop20\usbd_cdc_if.o: ../Drivers/CMSIS/Device/ST/STM32F0xx/Include/system_stm32f0xx.h
 042_ssop20\usbd_cdc_if.o: ../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal.h
 042_ssop20\usbd_cdc_if.o: ../Inc/stm32f0xx_hal_conf.h
-042_ssop20\usbd_cdc_if.o: ../Inc/mxconstants.h
+042_ssop20\usbd_cdc_if.o: ../Inc/main.h
 042_ssop20\usbd_cdc_if.o: ../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_rcc.h
 042_ssop20\usbd_cdc_if.o: ../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_def.h
 042_ssop20\usbd_cdc_if.o: ../Drivers/CMSIS/Device/ST/STM32F0xx/Include/stm32f0xx.h
-042_ssop20\usbd_cdc_if.o: ../Drivers/STM32F0xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h
 042_ssop20\usbd_cdc_if.o: ../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_rcc_ex.h
 042_ssop20\usbd_cdc_if.o: ../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_gpio.h
 042_ssop20\usbd_cdc_if.o: ../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_gpio_ex.h

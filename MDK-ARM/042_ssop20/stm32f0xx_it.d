@@ -1,7 +1,7 @@
 042_ssop20\stm32f0xx_it.o: ../Src/stm32f0xx_it.c
 042_ssop20\stm32f0xx_it.o: ../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal.h
 042_ssop20\stm32f0xx_it.o: ../Inc/stm32f0xx_hal_conf.h
-042_ssop20\stm32f0xx_it.o: ../Inc/mxconstants.h
+042_ssop20\stm32f0xx_it.o: ../Inc/main.h
 042_ssop20\stm32f0xx_it.o: ../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_rcc.h
 042_ssop20\stm32f0xx_it.o: ../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_def.h
 042_ssop20\stm32f0xx_it.o: ../Drivers/CMSIS/Device/ST/STM32F0xx/Include/stm32f0xx.h
@@ -13,7 +13,6 @@
 042_ssop20\stm32f0xx_it.o: ../Drivers/CMSIS/Include/core_cmFunc.h
 042_ssop20\stm32f0xx_it.o: ../Drivers/CMSIS/Device/ST/STM32F0xx/Include/system_stm32f0xx.h
 042_ssop20\stm32f0xx_it.o: ../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal.h
-042_ssop20\stm32f0xx_it.o: ../Drivers/STM32F0xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h
 042_ssop20\stm32f0xx_it.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 042_ssop20\stm32f0xx_it.o: ../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_rcc_ex.h
 042_ssop20\stm32f0xx_it.o: ../Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_gpio.h
