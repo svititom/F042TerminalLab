@@ -89,8 +89,9 @@ uint8_t UserTxBufferFS[APP_TX_DATA_SIZE];
 
 /* USB handler declaration */
 /* Handle for USB Full Speed IP */
-  USBD_HandleTypeDef  *hUsbDevice_0;
 /* USER CODE BEGIN PRIVATE_VARIABLES */
+  USBD_HandleTypeDef  *hUsbDevice_0;
+
 /* USER CODE END PRIVATE_VARIABLES */
 
 /**
@@ -100,7 +101,6 @@ uint8_t UserTxBufferFS[APP_TX_DATA_SIZE];
 /** @defgroup USBD_CDC_IF_Exported_Variables
   * @{
   */ 
-  extern USBD_HandleTypeDef hUsbDeviceFS;
 /* USER CODE BEGIN EXPORTED_VARIABLES */
 /* USER CODE END EXPORTED_VARIABLES */
 
