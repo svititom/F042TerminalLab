@@ -1,0 +1,26 @@
+# Prerequisites
+*.d
+
+# Object files
+*.o
+*.ko
+*.obj
+
+# Linker output
+*.ilk
+*.exp
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Libraries
+*.a
+*.la
+*.lo
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
