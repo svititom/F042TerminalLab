@@ -45,6 +45,9 @@
 #define REFRESH_PERIOD_MS (200)
 #define ADC_CHANNELS (3)
 #define USB_ENUMERATION_DELAY_MS (2000)
+//Ascii CRLF
+#define LF (10)
+#define CR (13)
 
 //value from datasheet
 #define VREFINT_CAL_ADDR ((uint16_t*) ((uint32_t)0x1FFFF7BA))
@@ -182,8 +185,10 @@ void receive_command(uint8_t* Buf){
 		pwm_tim.Instance->ARR = new_arr;
 	}
 	else if(Buf[0] == '?' || Buf[0] == 'h'){
-		//show help
 			show_help();
+	} else if(Buf[0] == CR || Buf[0] == LF) {
+		//echo new lines as a "freeze" function
+		CDC_Transmit_FS("\r\n", 2);
 	}
 }
 /* USER CODE END 0 */
@@ -245,8 +250,8 @@ int main(void)
   uint32_t freq_dfm;
   uint32_t freq_pwm;
   uint32_t calc[ADC_CHANNELS];
-  uint32_t vdd;
-	uint16_t duty_cycle;
+  uint32_t vdda;
+	float duty_cycle;
   char message[120];
   
   while (1)
@@ -267,20 +272,20 @@ int main(void)
 	  }
 		
 		calc[2] /= CONVERSIONS;
-		vdd = 3300;
-		vdd *= *(VREFINT_CAL_ADDR);
-		vdd /= calc[2];
+		vdda = 3300;
+		vdda *= *(VREFINT_CAL_ADDR);
+		vdda /= calc[2];
 		
 	  for(int i = 0; i < ADC_CHANNELS - 1; i++){
 			calc[i] /= CONVERSIONS;
-			calc[i] *= vdd;
+			calc[i] *= vdda;
 			calc[i] /= 4095;
 	  }
 	  duty_cycle = (float)pwm_tim.Instance->CCR1/(float)pwm_tim.Instance->ARR*100;
 	  freq_dfm = __HAL_TIM_GET_COMPARE(&dfm_slave_tim, TIM_CHANNEL_1);
 	  freq_pwm =  (HAL_RCC_GetPCLK1Freq())/((&pwm_tim)->Instance->PSC+1)/((&pwm_tim)->Instance->ARR+1);
 			
-	  sprintf(message, "Vdd: %4dmV, ADC PA1: %4dmV PA2: %4dmV, Freq in PA0: %8dHz, PWM out PA4: %dHz, Duty: %3d%%    \r", vdd, calc[0], calc[1], freq_dfm,freq_pwm,duty_cycle);
+	  sprintf(message, "ADC PA1: _%4dmV PA2: _%4dmV, Vdda: _%4dmV,   Freq in PA0: _%8dHz, PWM out PA4: _%dHz, Duty: _%3.1f%% \r", calc[0], calc[1], vdda, freq_dfm,freq_pwm,duty_cycle);
 		CDC_Transmit_FS((uint8_t *) message,strlen(message));
 	  HAL_Delay(REFRESH_PERIOD_MS);
   }
