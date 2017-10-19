@@ -68,6 +68,8 @@
 
 //value from datasheet
 #define VREFINT_CAL_ADDR ((uint16_t*) ((uint32_t)0x1FFFF7BA))
+#define defaultDisplaymode (General)
+uint16_t adc_buffer[ADC_CHANNELS*CONVERSIONS];
 
 /* USER CODE END Includes */
 
@@ -82,7 +84,8 @@ TIM_HandleTypeDef htim14;
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-
+enum DisplayMode{General, Voltmeter};
+volatile enum DisplayMode currentMode;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -105,16 +108,27 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 
 /* USER CODE BEGIN 0 */
 void show_help() {
-	char buf[210];
+	char buf[225];
  //wait for first transmission to finish with a bit of space
-	snprintf(buf, 207, "\r\n\n\nh or ? -> show this help\r\nq/w -> inc/dec pwm duty cycle by 10%%\r\ne/r -> inc/dec pwm freq rough\r\nd/f -> inc/dec pwm freq smooth\r\n042 Terminal Lab - Tomas Svitil, Dept of Measurement, FEL, CTU in Prague\r\n\n");
-	CDC_Transmit_FS((uint8_t *)buf, 207);
+	snprintf(buf, 225, "\r\n\n\nh or ? -> show this help\r\nm -> change mode\r\nq/w -> inc/dec pwm duty cycle by 10%%\r\ne/r -> inc/dec pwm freq rough\r\nd/f -> inc/dec pwm freq smooth\r\n042 Terminal Lab - Tomas Svitil, Dept of Measurement, FEL, CTU in Prague\r\n\n");
+	CDC_Transmit_FS((uint8_t *)buf, 225);
 
 	
 }
 
 void receive_command(uint8_t* Buf){
-	if(Buf[0] == 'q'){
+	if(Buf[0] == 'm'){
+		char infoMsg[50];
+		if (currentMode != defaultDisplaymode) {
+			currentMode = defaultDisplaymode;
+			sprintf(infoMsg,"\r\nDefault, m to change, h for help\r\n");
+		} else {
+			currentMode = Voltmeter;
+			sprintf(infoMsg,"\r\nVoltmeter, m to change, h for help\r\n");
+		}
+		CDC_Transmit_FS((uint8_t *)infoMsg, strlen(infoMsg));
+			
+	} else	if(Buf[0] == 'q'){
 		//increase DC
 		uint16_t duty_cycle = ((float)pwm_tim.Instance->CCR1+1)/((float)pwm_tim.Instance->ARR+1)*100;
 		uint16_t step = pwm_tim.Instance->ARR / 100;
@@ -199,8 +213,7 @@ void receive_command(uint8_t* Buf){
 		}
 		pwm_tim.Instance->CCR1 = new_arr * (float)((float)duty_cycle / (float)100);
 		pwm_tim.Instance->ARR = new_arr;
-	}
-	else if(Buf[0] == '?' || Buf[0] == 'h'){
+	} else if(Buf[0] == '?' || Buf[0] == 'h'){
 			show_help();
 	} else if(Buf[0] == CR || Buf[0] == LF) {
 		//echo new lines as a "freeze" function
@@ -277,6 +290,7 @@ int main(void)
 	 uint32_t freq_dfm;
   uint32_t freq_pwm;
   uint32_t calc[ADC_CHANNELS];
+	int16_t difference;
   uint32_t vdda;
 	float duty_cycle;
   char message[120];
@@ -309,11 +323,21 @@ int main(void)
 			calc[i] *= vdda;
 			calc[i] /= 4095;
 	  }
-	  duty_cycle = (float)pwm_tim.Instance->CCR1/(float)pwm_tim.Instance->ARR*100;
-	  freq_dfm = __HAL_TIM_GET_COMPARE(&dfm_slave_tim, TIM_CHANNEL_1);
-	  freq_pwm =  (HAL_RCC_GetPCLK1Freq())/((&pwm_tim)->Instance->PSC+1)/((&pwm_tim)->Instance->ARR+1);
+		switch (currentMode) {
 			
-	  sprintf(message, "ADC PA1: _%4dmV PA2: _%4dmV, Vdda: _%4dmV,   Freq in PA0: _%8dHz, PWM out PA4: _%dHz, Duty: _%3.1f%% \r", calc[0], calc[1], vdda, freq_dfm,freq_pwm,duty_cycle);
+			case Voltmeter:
+				difference = calc[0] - calc[1];
+			sprintf(message, "ADC PA1: _%4dmV PA2: _%4dmV, PA1-PA2: _%4dmV, Vdda: _%4dmV\r", calc[0], calc[1], difference, vdda);
+				break;
+			default:
+			case General:
+				  duty_cycle = (float)pwm_tim.Instance->CCR1/(float)pwm_tim.Instance->ARR*100;
+					freq_dfm = __HAL_TIM_GET_COMPARE(&dfm_slave_tim, TIM_CHANNEL_1);
+					freq_pwm =  (HAL_RCC_GetPCLK1Freq())/((&pwm_tim)->Instance->PSC+1)/((&pwm_tim)->Instance->ARR+1);	
+					sprintf(message, "ADC PA1: _%4dmV PA2: _%4dmV, Vdda: _%4dmV,   Freq in PA0: _%8dHz, PWM out PA4: _%dHz, Duty: _%3.1f%% \r", calc[0], calc[1], vdda, freq_dfm,freq_pwm,duty_cycle);
+	
+				break;				
+		}
 		CDC_Transmit_FS((uint8_t *) message,strlen(message));
 	  HAL_Delay(REFRESH_PERIOD_MS);
   }
@@ -347,7 +371,7 @@ void SystemClock_Config(void)
                               |RCC_CLOCKTYPE_PCLK1;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI48;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK)
   {
@@ -623,9 +647,9 @@ static void MX_TIM14_Init(void)
   TIM_OC_InitTypeDef sConfigOC;
 
   htim14.Instance = TIM14;
-  htim14.Init.Prescaler = 0;
+  htim14.Init.Prescaler = 47;
   htim14.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim14.Init.Period = 0;
+  htim14.Init.Period = 999;
   htim14.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim14.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim14) != HAL_OK)
@@ -639,7 +663,7 @@ static void MX_TIM14_Init(void)
   }
 
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 0;
+  sConfigOC.Pulse = 499;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim14, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
