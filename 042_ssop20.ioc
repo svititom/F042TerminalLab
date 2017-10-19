@@ -2,25 +2,10 @@
 ADC.ClockPrescaler=ADC_CLOCK_SYNC_PCLK_DIV4
 ADC.ContinuousConvMode=DISABLE
 ADC.DMAContinuousRequests=ENABLE
-<<<<<<< HEAD
-ADC.DataAlign=ADC_DATAALIGN_RIGHT
-ADC.DiscontinuousConvMode=DISABLE
-ADC.EOCSelection=ADC_EOC_SINGLE_CONV
-ADC.EnableAnalogWatchDog=false
-ADC.ExternalTrigConv=ADC_EXTERNALTRIGCONV_T3_TRGO
-ADC.ExternalTrigConvEdge=ADC_EXTERNALTRIGCONVEDGE_RISING
-ADC.IPParameters=ContinuousConvMode,DMAContinuousRequests,SamplingTime,ClockPrescaler,ExternalTrigConvEdge,ExternalTrigConv,Resolution,DataAlign,ScanConvMode,DiscontinuousConvMode,EOCSelection,Overrun,LowPowerAutoWait,LowPowerAutoPowerOff,EnableAnalogWatchDog
-ADC.LowPowerAutoPowerOff=DISABLE
-ADC.LowPowerAutoWait=DISABLE
-ADC.Overrun=ADC_OVR_DATA_PRESERVED
-ADC.Resolution=ADC_RESOLUTION_12B
-=======
 ADC.ExternalTrigConv=ADC_EXTERNALTRIGCONV_T3_TRGO
 ADC.ExternalTrigConvEdge=ADC_EXTERNALTRIGCONVEDGE_RISING
 ADC.IPParameters=ContinuousConvMode,DMAContinuousRequests,SamplingTime,ClockPrescaler,ExternalTrigConvEdge,ExternalTrigConv
->>>>>>> 963ba48d9149565c0bcb981ec8c4c78396f7ea9a
 ADC.SamplingTime=ADC_SAMPLETIME_239CYCLES_5
-ADC.ScanConvMode=ADC_SCAN_DIRECTION_FORWARD
 Dma.ADC.0.Direction=DMA_PERIPH_TO_MEMORY
 Dma.ADC.0.Instance=DMA1_Channel1
 Dma.ADC.0.MemDataAlignment=DMA_MDATAALIGN_HALFWORD
@@ -51,7 +36,6 @@ Mcu.Name=STM32F042F6Px
 Mcu.Package=TSSOP20
 Mcu.Pin0=PA0
 Mcu.Pin1=PA1
-<<<<<<< HEAD
 Mcu.Pin10=VP_TIM1_VS_ClockSourceINT
 Mcu.Pin11=VP_TIM1_VS_no_output1
 Mcu.Pin12=VP_TIM2_VS_ControllerModeReset
@@ -61,32 +45,15 @@ Mcu.Pin15=VP_TIM3_VS_ClockSourceINT
 Mcu.Pin16=VP_TIM3_VS_no_output1
 Mcu.Pin17=VP_TIM14_VS_ClockSourceINT
 Mcu.Pin18=VP_USB_DEVICE_VS_USB_DEVICE_CDC_FS
-=======
-Mcu.Pin10=VP_TIM1_VS_no_output1
-Mcu.Pin11=VP_TIM2_VS_ControllerModeReset
-Mcu.Pin12=VP_TIM2_VS_ClockSourceITR
-Mcu.Pin13=VP_TIM2_VS_CH1
-Mcu.Pin14=VP_TIM3_VS_ClockSourceINT
-Mcu.Pin15=VP_TIM3_VS_no_output1
-Mcu.Pin16=VP_TIM14_VS_ClockSourceINT
-Mcu.Pin17=VP_USB_DEVICE_VS_USB_DEVICE_CDC_FS
->>>>>>> 963ba48d9149565c0bcb981ec8c4c78396f7ea9a
 Mcu.Pin2=PA2
 Mcu.Pin3=PA4
 Mcu.Pin4=PA11
 Mcu.Pin5=PA12
 Mcu.Pin6=VP_ADC_Vref_Input
-<<<<<<< HEAD
 Mcu.Pin7=VP_RCC_USB
 Mcu.Pin8=VP_SYS_VS_PINREMAP
 Mcu.Pin9=VP_SYS_VS_Systick
 Mcu.PinsNb=19
-=======
-Mcu.Pin7=VP_SYS_VS_PINREMAP
-Mcu.Pin8=VP_SYS_VS_Systick
-Mcu.Pin9=VP_TIM1_VS_ClockSourceINT
-Mcu.PinsNb=18
->>>>>>> 963ba48d9149565c0bcb981ec8c4c78396f7ea9a
 Mcu.UserConstants=
 Mcu.UserName=STM32F042F6Px
 MxCube.Version=4.22.1
@@ -108,7 +75,6 @@ PA12.Signal=USB_DP
 PA2.Mode=IN2
 PA2.Signal=ADC_IN2
 PA4.Signal=S_TIM14_CH1
-<<<<<<< HEAD
 PCC.Checker=false
 PCC.Line=STM32F0x2
 PCC.MCU=STM32F042F6Px
@@ -117,15 +83,13 @@ PCC.Seq0=0
 PCC.Series=STM32F0
 PCC.Temperature=25
 PCC.Vdd=3.6
-=======
->>>>>>> 963ba48d9149565c0bcb981ec8c4c78396f7ea9a
 PinOutPanel.RotationAngle=0
 ProjectManager.AskForMigrate=true
 ProjectManager.BackupPrevious=false
 ProjectManager.CompilerOptimize=2
 ProjectManager.ComputerToolchain=false
 ProjectManager.CoupleFile=false
-ProjectManager.CustomerFirmwarePackage=
+ProjectManager.CustomerFirmwarePackage=C\:/Users/swith/STM32Cube/Repository/STM32Cube_FW_F0_V1.9.0
 ProjectManager.DefaultFWLocation=true
 ProjectManager.DeletePrevious=true
 ProjectManager.DeviceId=STM32F042F6Px
@@ -174,14 +138,7 @@ TIM1.Prescaler=4799
 TIM1.Pulse-Output\ Compare1\ No\ Output=9999
 TIM1.TIM_MasterOutputTrigger=TIM_TRGO_OC1
 TIM14.Channel=TIM_CHANNEL_1
-<<<<<<< HEAD
-TIM14.IPParameters=Channel,Prescaler,Period,Pulse
-TIM14.Period=9999
-TIM14.Prescaler=47
-TIM14.Pulse=499
-=======
 TIM14.IPParameters=Channel
->>>>>>> 963ba48d9149565c0bcb981ec8c4c78396f7ea9a
 TIM2.Channel-Input_Capture1_from_TRC=TIM_CHANNEL_1
 TIM2.IPParameters=Period,Channel-Input_Capture1_from_TRC
 TIM2.Period=0xffffffff
@@ -192,26 +149,20 @@ TIM3.Prescaler=47
 TIM3.Pulse-Output\ Compare1\ No\ Output=9999
 TIM3.TIM_MasterOutputTrigger=TIM_TRGO_OC1
 TIM3.TIM_MasterSlaveMode=TIM_MASTERSLAVEMODE_DISABLE
-<<<<<<< HEAD
 USB.IPParameters=ep0_mps
-USB.ep0_mps=DEP0CTL_MPS_8
+USB.ep0_mps=DEP0CTL_MPS_64
 USB_DEVICE.APP_RX_DATA_SIZE=4
 USB_DEVICE.APP_TX_DATA_SIZE=4
-=======
->>>>>>> 963ba48d9149565c0bcb981ec8c4c78396f7ea9a
 USB_DEVICE.CLASS_NAME_FS=CDC
 USB_DEVICE.IPParameters=VirtualMode,VirtualModeFS,USBD_HandleTypeDef,CLASS_NAME_FS,APP_RX_DATA_SIZE,APP_TX_DATA_SIZE,USBD_SELF_POWERED
 USB_DEVICE.USBD_HandleTypeDef=hUsbDeviceFS
-USB_DEVICE.USBD_SELF_POWERED=0
+USB_DEVICE.USBD_SELF_POWERED=1
 USB_DEVICE.VirtualMode=Cdc
 USB_DEVICE.VirtualModeFS=Cdc_FS
 VP_ADC_Vref_Input.Mode=IN-Vrefint
 VP_ADC_Vref_Input.Signal=ADC_Vref_Input
-<<<<<<< HEAD
 VP_RCC_USB.Mode=CRS SYNC Source USB
 VP_RCC_USB.Signal=RCC_USB
-=======
->>>>>>> 963ba48d9149565c0bcb981ec8c4c78396f7ea9a
 VP_SYS_VS_PINREMAP.Mode=PINREMAP
 VP_SYS_VS_PINREMAP.Signal=SYS_VS_PINREMAP
 VP_SYS_VS_Systick.Mode=SysTick

@@ -51,6 +51,7 @@
 #include "usb_device.h"
 
 /* USER CODE BEGIN Includes */
+
 #include "usbd_cdc_if.h"	
 #define dfm_master_tim htim1
 #define dfm_slave_tim htim2
@@ -67,8 +68,6 @@
 
 //value from datasheet
 #define VREFINT_CAL_ADDR ((uint16_t*) ((uint32_t)0x1FFFF7BA))
-
-uint16_t adc_buffer[ADC_CHANNELS*CONVERSIONS];
 
 /* USER CODE END Includes */
 
@@ -100,7 +99,7 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
                                 
 
 /* USER CODE BEGIN PFP */
-/* Private function prototypes ---------------------------	--------------------*/
+/* Private function prototypes -----------------------------------------------*/
 
 /* USER CODE END PFP */
 
@@ -244,7 +243,8 @@ int main(void)
   MX_TIM3_Init();
 
   /* USER CODE BEGIN 2 */
-  HAL_Delay(USB_ENUMERATION_DELAY_MS);
+	//if the delay is not long enough, the device will be reported as not woring
+	HAL_Delay(USB_ENUMERATION_DELAY_MS);
 	
 	HAL_ADC_Stop(&hadc);
   if(HAL_ADCEx_Calibration_Start(&hadc) != HAL_OK) {
@@ -252,39 +252,42 @@ int main(void)
 	}
 	HAL_Delay(100);
 
+	//Start timers for Direct Frequency Measurement
 	HAL_TIM_Base_Start(&dfm_slave_tim);
 	HAL_TIM_IC_Start(&dfm_slave_tim, TIM_CHANNEL_1);
 	HAL_TIM_Base_Start(&dfm_master_tim);
 	HAL_TIM_OC_Start(&dfm_master_tim, TIM_CHANNEL_1);
 	
-	HAL_TIM_Base_Start(&adc_tim);
-	HAL_TIM_OC_Start(&adc_tim, TIM_CHANNEL_1);
-	
+	//Start PWM Generation
 	HAL_TIM_Base_Start(&pwm_tim);
 	HAL_TIM_PWM_Start(&pwm_tim, TIM_CHANNEL_1);
 	
+	//Start the ADC trigger timer
+	HAL_TIM_Base_Start(&adc_tim);
+	HAL_TIM_OC_Start(&adc_tim, TIM_CHANNEL_1);
+	
+  //And start the ADC in Direct Memory Access mode
 	HAL_ADC_Start_DMA(&hadc, (uint32_t *)&adc_buffer, CONVERSIONS*ADC_CHANNELS);
 
 	CDC_Transmit_FS("\nType h or ? for help\r\n", 23);
-	HAL_Delay(200);
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  uint32_t freq_dfm;
+	 uint32_t freq_dfm;
   uint32_t freq_pwm;
   uint32_t calc[ADC_CHANNELS];
   uint32_t vdda;
 	float duty_cycle;
   char message[120];
-  
+	
   while (1)
   {
+
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
-		for(int i = 0; i < ADC_CHANNELS; i++) {
+	for(int i = 0; i < ADC_CHANNELS; i++) {
 			calc[i] = 0;
 		}
 	  //calculate adc values, average from #CONVERSION samples
@@ -620,9 +623,9 @@ static void MX_TIM14_Init(void)
   TIM_OC_InitTypeDef sConfigOC;
 
   htim14.Instance = TIM14;
-  htim14.Init.Prescaler = 47;
+  htim14.Init.Prescaler = 0;
   htim14.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim14.Init.Period = 9999;
+  htim14.Init.Period = 0;
   htim14.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim14.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim14) != HAL_OK)
@@ -636,7 +639,7 @@ static void MX_TIM14_Init(void)
   }
 
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 499;
+  sConfigOC.Pulse = 0;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim14, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
