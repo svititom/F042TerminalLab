@@ -331,7 +331,7 @@ int main(void)
 				break;
 			default:
 			case General:
-				  duty_cycle = (float)pwm_tim.Instance->CCR1/(float)pwm_tim.Instance->ARR*100;
+				  duty_cycle = (float)(pwm_tim.Instance->CCR1 + 1.0)/(float)(pwm_tim.Instance->ARR + 1.0)*100.0;
 					freq_dfm = __HAL_TIM_GET_COMPARE(&dfm_slave_tim, TIM_CHANNEL_1);
 					freq_pwm =  (HAL_RCC_GetPCLK1Freq())/((&pwm_tim)->Instance->PSC+1)/((&pwm_tim)->Instance->ARR+1);	
 					sprintf(message, "ADC PA1: _%4dmV PA2: _%4dmV, Vdda: _%4dmV,   Freq in PA0: _%8dHz, PWM out PA4: _%dHz, Duty: _%3.1f%% \r", calc[0], calc[1], vdda, freq_dfm,freq_pwm,duty_cycle);
