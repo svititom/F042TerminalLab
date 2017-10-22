@@ -45,8 +45,8 @@ If flashing the microcontroller via DFU
 
 ## 2.3 Wiring ##
 
-[TSSOP20 Pinout](/Documentation/Images/TSSOP20_pinout.PNG)
-[LQFP32 Pinout](/Documentation/Images/LQFP32_pinout.PNG)
+![TSSOP20 Pinout](/Documentation/Images/TSSOP20_pinout.png)
+![LQFP32 Pinout](/Documentation/Images/LQFP32_pinout.png)
 
 ## 2.4 Flashing ##
 
