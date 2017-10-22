@@ -1,7 +1,7 @@
 # 0 Overview #
 This project aims to provide a simple multimeter (voltmeter, counter, pwm generator) for the STM32F042 microcontrollers via native USB and a virtuar COM port. It is used via a terminal application such a PuTTY running on the host PC. 
 Since the firmware was created with the help of STM32CubeMX, porting it to any other STM32 microcontroller should be no problem if the need arises. 
-![Overview](/Documentation/Images/OperationScreen.png)
+![Overview](/Documentation/Images/OperationScreen.PNG)
 
 # 1 Specification #
 Compatible with all STM32F042 packages, including the TSSOP20
@@ -45,8 +45,8 @@ If flashing the microcontroller via DFU
 
 ## 2.3 Wiring ##
 
-![TSSOP20 Pinout](/Documentation/Images/TSSOP20_pinout.png)
-![LQFP32 Pinout](/Documentation/Images/LQFP32_pinout.png)
+![TSSOP20 Pinout](/Documentation/Images/TSSOP20_pinout.PNG)
+![LQFP32 Pinout](/Documentation/Images/LQFP32_pinout.PNG)
 
 ## 2.4 Flashing ##
 
